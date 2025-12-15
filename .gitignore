@@ -1,0 +1,30 @@
+# Envs
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Secrets
+.env
+
+# Data & indexes (POC : on évite de versionner)
+data/raw/
+data/processed/
+data/index/
