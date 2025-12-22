@@ -31,7 +31,8 @@ cd puls-events-rag
 ```bash
 python -m venv .venv
 ```
-Activer l'environnement :
+
+### 3) Activer l'environnement :
 macOS/Linux :
 ```bash
 source .venv/bin/activate
@@ -41,7 +42,7 @@ Windows PowerShell :
 .\.venv\Scripts\Activate.ps1
 ```
 
-### 3) Installer les dépendances
+### 4) Installer les dépendances
 ```bash
 pip install -U pip
 pip install -r requirements.txt
@@ -72,3 +73,106 @@ Puis tester :
 
 - Le dossier data/ contient les exports OpenAgenda, les données nettoyées, et l’index FAISS : il n’est pas versionné.
 - Les clés API ne doivent jamais être commit : utiliser .env.
+
+## Pré-processing des données OpenAgenda
+
+### Source des données
+Les données utilisées proviennent de l’API OpenAgenda.
+L’agenda sélectionné pour ce POC est : **universite-paris-saclay**.
+
+Les événements sont récupérés via l’endpoint `/v2/agendas/{agendaUID}/events`,
+en utilisant une pagination par curseur (`after`) afin de collecter l’intégralité du corpus.
+
+### Volume de données
+- Événements bruts récupérés : ~3800
+- Événements après nettoyage et validation : ~3800
+- Événements récents (< 1 an) : ~600
+- Événements à venir : ~50
+
+### Nettoyage et validation
+Les règles de nettoyage suivantes ont été appliquées :
+- suppression des événements sans date (`first_begin_dt` manquant)
+- suppression des titres trop courts
+- suppression des descriptions trop pauvres, sauf si un lieu est renseigné
+- dédoublonnage des événements sur l’identifiant unique `uid`
+
+Ces règles visent à garantir une qualité minimale du contenu textuel avant indexation.
+
+### Filtrage temporel
+Conformément aux consignes du projet, les événements conservés respectent l’une des conditions suivantes :
+- événements dont la date de début est comprise dans les 365 derniers jours
+- événements dont la date de début est postérieure à la date courante
+
+Le jeu final utilisé pour l’indexation est la concaténation des deux sous-ensembles
+(`past_year` et `upcoming`).
+
+### Structuration et préparation pour l’indexation
+Un schéma de données stable est défini, incluant :
+- identifiants
+- métadonnées temporelles
+- informations de localisation
+- contenu textuel
+
+Un champ texte unique `document` est construit pour chaque événement.
+Il concatène le titre, la description, la date, le lieu et les mots-clés.
+Ce champ constitue l’entrée principale pour la vectorisation.
+
+Les dates sont exportées au format ISO afin d’assurer une compatibilité
+et une interprétation correcte lors des phases ultérieures.
+
+### Tests unitaires
+Des tests unitaires ont été mis en place pour vérifier :
+- l’existence des fichiers générés
+- la présence des champs essentiels
+- le respect des bornes temporelles
+- la non-vacuité du champ `document`
+
+Ces tests garantissent la reproductibilité et la robustesse du pipeline de pré-processing.
+
+## Base de données vectorielle (FAISS)
+
+Cette étape consiste à transformer les événements culturels nettoyés en vecteurs sémantiques
+et à les indexer dans une base vectorielle FAISS afin de permettre une recherche rapide par similarité.
+
+### Données en entrée
+- Fichier : `data/processed/events_index_ready.jsonl`
+- Nombre d’événements : ~661
+- Champ textuel indexé : `document` (titre, description, date, lieu, mots-clés)
+- Métadonnées conservées : identifiant, dates, localisation, type d’événement, lien vers l’agenda
+
+### Découpage des textes (chunking)
+Les textes sont découpés en chunks avant vectorisation afin d’améliorer la précision de la recherche.
+- Taille des chunks : 800 caractères
+- Overlap : 120 caractères
+- Outil : `RecursiveCharacterTextSplitter` (LangChain)
+
+Dans le cas présent, la majorité des événements tiennent dans un seul chunk.
+
+### Vectorisation
+- Modèle d’embeddings : `sentence-transformers/all-MiniLM-L6-v2`
+- Calcul des embeddings en local (pas d’API externe)
+- Un embedding est généré par chunk
+
+### Indexation FAISS
+- Type d’index : FAISS (via LangChain)
+- Nombre de vecteurs indexés : ~661
+- L’index est persisté localement dans : `data/index/faiss_events/`
+
+Un script de reconstruction permet de régénérer l’index à partir des données brutes en une seule commande.
+
+### Recherche sémantique
+La recherche est réalisée via un `Retriever` LangChain :
+- récupération des `k` documents les plus similaires
+- filtrage géographique post-retrieval pour privilégier les événements locaux (Paris-Saclay)
+- accès aux métadonnées pour enrichir les réponses (date, ville, lien)
+
+### Qualité et performance
+- Vérification de la complétude de l’index (nombre de vecteurs cohérent)
+- Latence moyenne de recherche : ~27 ms (local)
+- Tests unitaires automatisés validant :
+  - le chargement de l’index
+  - la présence de vecteurs
+  - la capacité à retourner des résultats pertinents
+
+Cette base vectorielle constitue le socle du système RAG et sera utilisée dans l’étape suivante
+pour la génération de réponses augmentées via un modèle de langage (Mistral).
