@@ -1,0 +1,11 @@
+id,verdict,exact_match,precision,recall,f1,expected_uids,predicted_uids,question
+q01,partial,False,0.3333,1.0,0.5,"82396121","52982604 82396121 9188885","Je cherche une conférence scientifique à venir autour de Gif-sur-Yvette."
+q02,partial,False,0.25,1.0,0.4,"84743908","52982604 53663254 82396121 84743908","Je veux une exposition ou une visite sur le campus (Orsay ou Gif-sur-Yvette)."
+q03,correct,True,1.0,1.0,1.0,"","","Quels événements pour les étudiants ou les associations sont prévus prochainement ?"
+q04,partial,False,0.2,1.0,0.3333,"30372878","30372878 52982604 53663254 82396121 9188885","Y a-t-il un événement de type spectacle ou théâtre à venir à Gif-sur-Yvette ?"
+q05,correct,True,1.0,1.0,1.0,"","","Je cherche un événement sur l’environnement ou le climat à venir autour de Paris-Saclay."
+q06,partial,False,0.2,1.0,0.3333,"52982604","30372878 52982604 82396121 9188885 96974591","Qu’est-ce qu’il y a à faire ce week-end autour de Gif-sur-Yvette ?"
+q07,partial,False,0.2,1.0,0.3333,"82396121","20797170 53663254 82396121 9188885 96476752","Je cherche un concert de métal à Gif-sur-Yvette ce soir."
+q08,correct,True,1.0,1.0,1.0,"","","Je suis à Lyon, que me recommandes-tu ?"
+q09,correct,True,1.0,1.0,1.0,"","","Je veux sortir."
+q10,correct,True,1.0,1.0,1.0,"","","Donne-moi des informations sur l’événement 'Science à la coque'."

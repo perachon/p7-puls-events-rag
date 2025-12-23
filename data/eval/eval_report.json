@@ -1,0 +1,172 @@
+{
+  "summary": {
+    "n": 10,
+    "accuracy_correct": 0.5,
+    "rate_partial": 0.5,
+    "rate_incorrect": 0.0,
+    "counts": {
+      "correct": 5,
+      "partial": 5,
+      "incorrect": 0
+    }
+  },
+  "results": [
+    {
+      "id": "q01",
+      "question": "Je cherche une conférence scientifique à venir autour de Gif-sur-Yvette.",
+      "expected_uids": [
+        "82396121"
+      ],
+      "predicted_uids": [
+        "52982604",
+        "82396121",
+        "9188885"
+      ],
+      "exact_match": false,
+      "precision": 0.3333,
+      "recall": 1.0,
+      "f1": 0.5,
+      "verdict": "partial",
+      "answer": "Je n'ai pas trouvé d'événement correspondant à cette demande.\n\nSources :\n- 52982604\n- 82396121\n- 9188885"
+    },
+    {
+      "id": "q02",
+      "question": "Je veux une exposition ou une visite sur le campus (Orsay ou Gif-sur-Yvette).",
+      "expected_uids": [
+        "84743908"
+      ],
+      "predicted_uids": [
+        "52982604",
+        "53663254",
+        "82396121",
+        "84743908"
+      ],
+      "exact_match": false,
+      "precision": 0.25,
+      "recall": 1.0,
+      "f1": 0.4,
+      "verdict": "partial",
+      "answer": "Je n'ai pas trouvé d'événement correspondant à une exposition ou une visite sur le campus d'Orsay ou de Gif-sur-Yvette dans les données fournies.\n\nSources :\n- 52982604\n- 53663254\n- 82396121\n- 84743908"
+    },
+    {
+      "id": "q03",
+      "question": "Quels événements pour les étudiants ou les associations sont prévus prochainement ?",
+      "expected_uids": [],
+      "predicted_uids": [],
+      "exact_match": true,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "verdict": "correct",
+      "answer": "Je n'ai pas trouvé d'événement correspondant à cette demande. Tu peux essayer d'élargir le thème, la période ou la zone géographique."
+    },
+    {
+      "id": "q04",
+      "question": "Y a-t-il un événement de type spectacle ou théâtre à venir à Gif-sur-Yvette ?",
+      "expected_uids": [
+        "30372878"
+      ],
+      "predicted_uids": [
+        "30372878",
+        "52982604",
+        "53663254",
+        "82396121",
+        "9188885"
+      ],
+      "exact_match": false,
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1": 0.3333,
+      "verdict": "partial",
+      "answer": "Voici quelques événements de type spectacle ou théâtre à venir à Gif-sur-Yvette :\n\n- **Pourquoi un arbre est une poule ?**\n  - **Date** : 2026-06-06 à 14h00\n  - **Lieu** : Scène de Recherche ENS Paris-Saclay\n  - **Ville** : Gif-sur-Yvette\n  - **Justification** : Spectacle de danse et arts plastiques par MA Compagnie / Marc Lacourt.\n\n- **ADA, au-delà de l’image**\n  - **Date** : 2026-03-19 à 18h30\n  - **Lieu** : Scène de Recherche ENS Paris-Saclay\n  - **Ville** : Gif-sur-Yvette\n  - **Justification** : Spectacle mêlant musique, théâtre et intelligence artificielle par Véronique Caye.\n\n- **Festin du mardi midi : de dIAboli**\n  - **Date** : 2026-05-20 à 10h30\n  - **Lieu** : Scène de Recherche ENS Paris-Saclay\n  - **Ville** : Gif-sur-Yvette\n  - **Justification** : Spectacle de danse et théâtre explorant l'intelligence artificielle par la Compagnie Louve / Christine Armanger.\n\n- **Détail d’un vase grec à figures rouges**\n  - **Date** : 2026-01-30 à 19h00\n  - **Lieu** : Scène de Recherche ENS Paris-Saclay\n  - **Ville** : Gif-sur-Yvette\n  - **Justification** : Spectacle de théâtre et stand-up absurde par la Cie Frenhofer / Flavien Bellec et Etienne Blanc.\n\nSources :\n- 30372878\n- 52982604\n- 53663254\n- 82396121\n- 9188885"
+    },
+    {
+      "id": "q05",
+      "question": "Je cherche un événement sur l’environnement ou le climat à venir autour de Paris-Saclay.",
+      "expected_uids": [],
+      "predicted_uids": [],
+      "exact_match": true,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "verdict": "correct",
+      "answer": "Je n'ai pas trouvé d'événement suffisamment pertinent pour cette demande dans les données. Essaie un thème plus large (ex: “conférence”, “exposition”, “atelier”) ou une autre ville."
+    },
+    {
+      "id": "q06",
+      "question": "Qu’est-ce qu’il y a à faire ce week-end autour de Gif-sur-Yvette ?",
+      "expected_uids": [
+        "52982604"
+      ],
+      "predicted_uids": [
+        "30372878",
+        "52982604",
+        "82396121",
+        "9188885",
+        "96974591"
+      ],
+      "exact_match": false,
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1": 0.3333,
+      "verdict": "partial",
+      "answer": "Voici quelques événements à faire ce week-end autour de Gif-sur-Yvette :\n\n1. **Pourquoi un arbre est une poule ?**\n   - **Date** : 6 juin 2026 à 14h00\n   - **Lieu** : Scène de Recherche ENS Paris-Saclay\n   - **Ville** : Gif-sur-Yvette\n   - **Justification** : Un spectacle de danse et d'arts plastiques qui promet une expérience artistique unique.\n\n2. **Festin du mardi midi : de dIAboli**\n   - **Date** : 20 mai 2026 à 10h30\n   - **Lieu** : Scène de Recherche ENS Paris-Saclay\n   - **Ville** : Gif-sur-Yvette\n   - **Justification** : Un spectacle mêlant danse, théâtre et intelligence artificielle, parfait pour les amateurs de performances innovantes.\n\n3. **ADA, au-delà de l’image**\n   - **Date** : 19 mars 2026 à 18h30\n   - **Lieu** : Scène de Recherche ENS Paris-Saclay\n   - **Ville** : Gif-sur-Yvette\n   - **Justification** : Un spectacle explorant les thèmes de la musique, du théâtre et des biais de l'intelligence artificielle.\n\n4. **Atelier Théâtre et humour absurde**\n   - **Date** : 29 janvier 2026 à 17h00\n   - **Lieu** : Scène de Recherche ENS Paris-Saclay\n   - **Ville** : Gif-sur-Yvette\n   - **Justification** : Un atelier interactif combinant théâtre, stand-up et humour absurde, idéal pour ceux qui aiment participer.\n\n5. **Quand la ville se lève**\n   - **Date** : 16 janvier 2026 à 19h00\n   - **Lieu** : Scène de Recherche ENS Paris-Saclay\n   - **Ville** : Gif-sur-Yvette\n   - **Justification** : Un spectacle de théâtre explorant des thèmes urbains, parfait pour les amateurs de pièces contemporaines.\n\nSources :\n- 30372878\n- 52982604\n- 82396121\n- 9188885\n- 96974591"
+    },
+    {
+      "id": "q07",
+      "question": "Je cherche un concert de métal à Gif-sur-Yvette ce soir.",
+      "expected_uids": [
+        "82396121"
+      ],
+      "predicted_uids": [
+        "20797170",
+        "53663254",
+        "82396121",
+        "9188885",
+        "96476752"
+      ],
+      "exact_match": false,
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1": 0.3333,
+      "verdict": "partial",
+      "answer": "Je n'ai pas trouvé d'événement correspondant à cette demande.\n\nSources :\n- 20797170\n- 53663254\n- 82396121\n- 9188885\n- 96476752"
+    },
+    {
+      "id": "q08",
+      "question": "Je suis à Lyon, que me recommandes-tu ?",
+      "expected_uids": [],
+      "predicted_uids": [],
+      "exact_match": true,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "verdict": "correct",
+      "answer": "Je n'ai pas trouvé d'événement suffisamment pertinent pour cette demande dans les données. Essaie un thème plus large (ex: “conférence”, “exposition”, “atelier”) ou une autre ville."
+    },
+    {
+      "id": "q09",
+      "question": "Je veux sortir.",
+      "expected_uids": [],
+      "predicted_uids": [],
+      "exact_match": true,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "verdict": "correct",
+      "answer": "Je n'ai pas trouvé d'événement suffisamment pertinent pour cette demande dans les données. Essaie un thème plus large (ex: “conférence”, “exposition”, “atelier”) ou une autre ville."
+    },
+    {
+      "id": "q10",
+      "question": "Donne-moi des informations sur l’événement 'Science à la coque'.",
+      "expected_uids": [],
+      "predicted_uids": [],
+      "exact_match": true,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "verdict": "correct",
+      "answer": "Je n'ai pas trouvé d'événement suffisamment pertinent pour cette demande dans les données. Essaie un thème plus large (ex: “conférence”, “exposition”, “atelier”) ou une autre ville."
+    }
+  ]
+}
