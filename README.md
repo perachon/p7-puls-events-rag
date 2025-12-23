@@ -176,3 +176,90 @@ La recherche est réalisée via un `Retriever` LangChain :
 
 Cette base vectorielle constitue le socle du système RAG et sera utilisée dans l’étape suivante
 pour la génération de réponses augmentées via un modèle de langage (Mistral).
+
+-------------------------------
+--------------------------------
+----------------------------------------
+
+## Système RAG (Retrieval-Augmented Generation)
+
+### Objectif
+Cette étape vise à implémenter un **chatbot intelligent** capable de recommander des événements culturels à partir des données OpenAgenda, en combinant :
+- une **recherche sémantique** dans une base vectorielle FAISS,
+- et la **génération de réponses naturelles** à l’aide d’un LLM (Mistral).
+
+Le système repose sur une architecture **RAG (Retrieval-Augmented Generation)** afin de garantir des réponses pertinentes, traçables et limitées aux données disponibles.
+
+### Architecture du système
+
+1. Question utilisateur  
+2. Vectorisation de la requête  
+3. Recherche sémantique dans FAISS  
+   - filtrage géographique (zone Paris-Saclay)  
+   - filtrage temporel (événements à venir)  
+   - seuil de similarité pour limiter le bruit  
+4. Construction du contexte  
+   - descriptions des événements pertinents  
+   - métadonnées (date, lieu, ville, uid)  
+5. Génération de la réponse  
+   - appel au LLM Mistral via LangChain  
+   - prompt contraint (anti-hallucination)  
+6. Réponse finale  
+   - texte généré  
+   - liste des sources (UID OpenAgenda)  
+
+### Gestion des hallucinations
+Le chatbot respecte les règles suivantes :
+- les réponses sont générées **uniquement à partir du contexte récupéré**
+- si aucun événement pertinent n’est trouvé, le bot répond explicitement qu’il n’y a pas de résultat
+- les **sources ne sont jamais générées par le LLM**, mais ajoutées côté code à partir des documents réellement récupérés
+- aucun événement, date ou lieu n’est inventé
+
+### Format de sortie
+Chaque réponse contient :
+- une **réponse textuelle structurée**
+- une section **Sources** listant les UID OpenAgenda utilisés  
+  (ou *Aucune source pertinente* si aucun événement n’a été trouvé)
+
+### Lancer une démonstration
+Depuis la racine du projet :
+```bash
+python -m src.rag.demo_rag
+```
+Pour tester plusieurs scénarios utilisateurs :
+```bash
+python -m src.rag.demo_scenarios
+```
+
+### Jeu de test annoté (Gold Standard)
+Un jeu de test manuel a été construit pour évaluer la qualité des réponses :
+- Fichier : data/eval/qa_gold.jsonl
+- 10 questions représentatives :
+  - recommandations thématiques
+  - cas sans résultat
+  - questions vagues
+  - hors périmètre géographique
+- Chaque question est associée à :
+  - une description de réponse attendue
+  - une liste d’UID OpenAgenda attendus (expected_uids)
+Ce jeu constitue la vérité terrain (gold standard) utilisée pour l’évaluation automatique.
+
+### Évaluation automatique
+Un script d’évaluation compare les réponses du chatbot au jeu de test annoté.
+Commande :
+```bash
+python -m src.eval.evaluate_rag
+```
+Métriques calculées :
+- Exact Match (UID)
+- Précision
+- Rappel
+- F1-score
+- Verdict par question : correct, partial, incorrect
+
+Résultats obtenus (POC)
+- 50 % réponses correctes
+- 50 % partiellement correctes
+- 0 % réponses incorrectes
+
+Ces résultats montrent une bonne robustesse globale du système, avec des pistes d’amélioration possibles sur le classement des résultats.

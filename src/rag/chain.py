@@ -78,8 +78,11 @@ def format_sources_block(sources: List[Dict[str, Any]]) -> str:
     return "\n\nSources :\n- " + "\n- ".join(uids) if uids else "\n\nSources :\n- Aucune source pertinente."
 
 
-def answer_question(question: str, allowed_cities: Optional[Set[str]] = None) -> RAGResult:
+def answer_question(question: str, allowed_cities: Optional[Set[str]] = None, llm_override = None) -> RAGResult:
     retriever, prompt, llm = build_components(allowed_cities=allowed_cities)
+
+    if llm_override is not None:
+        llm = llm_override
 
     scored = retriever.retrieve(question)
     docs = [d for d, _ in scored]
