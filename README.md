@@ -263,3 +263,140 @@ Résultats obtenus (POC)
 - 0 % réponses incorrectes
 
 Ces résultats montrent une bonne robustesse globale du système, avec des pistes d’amélioration possibles sur le classement des résultats.
+
+## Exposer le système RAG via une API REST
+
+### Objectif
+Cette étape a pour objectif de rendre le système **RAG (Retrieval-Augmented Generation)** accessible via une **API REST locale**, afin de permettre aux équipes métier de tester facilement la solution en posant des questions en langage naturel.
+
+L’API permet :
+- de poser une question en entrée,
+- d’obtenir une réponse enrichie par les documents pertinents,
+- de reconstruire la base vectorielle à la demande lorsque les données évoluent.
+
+### Architecture générale
+L’architecture repose sur une **séparation claire des responsabilités** :
+
+- **Couche RAG (logique métier)**
+  - Construction de la chaîne RAG (retriever, prompt, LLM)
+  - Filtrage des documents (ville, date, pertinence)
+  - Génération de la réponse finale avec sources
+
+- **Couche API (FastAPI)**
+  - Exposition des endpoints HTTP
+  - Validation des entrées
+  - Gestion des erreurs
+  - Documentation Swagger automatique
+
+- **Couche Indexation**
+  - Construction et persistance de la base vectorielle FAISS
+  - Reconstruction complète de l’index sur demande
+
+Cette séparation permet une bonne maintenabilité et facilite l’évolution du système.
+
+### API REST (FastAPI)
+
+#### Lancement de l’API
+L’API est lancée localement à l’aide de Uvicorn :
+```bash
+uvicorn src.api.main:app --reload
+```
+Une documentation interactive est automatiquement générée et accessible à l’adresse :
+```text
+http://127.0.0.1:8000/docs
+```
+
+### Endpoint `/ask` — Poser une question
+
+**Méthode :** POST  
+
+**Description :**  
+Permet de poser une question au système RAG et d’obtenir une réponse augmentée par les documents les plus pertinents.
+
+**Exemple de requête :**
+```json
+{
+  "question": "Quels événements sont prévus à Orsay ?",
+  "allowed_cities": ["Orsay"],
+  "future_only": true
+}
+```
+
+**Paramètres :**
+- `question` (obligatoire) : question utilisateur en langage naturel
+- `allowed_cities` (optionnel) : liste de villes autorisées pour le filtrage
+- `future_only` (optionnel, défaut = true) : ne retourner que les événements à venir
+
+**Réponse :**
+- une réponse textuelle générée par le LLM
+- la liste des sources utilisées (métadonnées + extraits)
+
+### Endpoint `/rebuild` — Reconstruire la base vectorielle
+
+**Méthode :** POST  
+
+**Description :**  
+Reconstruit entièrement la base vectorielle FAISS à partir des données sources actuelles.
+
+Cet endpoint ne prend **aucun paramètre**, afin de garantir la cohérence de l’index (mêmes règles de nettoyage, de segmentation et d’embeddings à chaque reconstruction).
+
+**Utilisation typique :**
+- après un nouveau scraping,
+- après l’ajout ou la mise à jour des données,
+- après modification du pipeline d’indexation.
+
+**Réponse :**
+- statut de l’opération,
+- durée de reconstruction,
+- sortie standard (`stdout`) et erreurs éventuelles (`stderr`).
+
+### Gestion “production-like” minimale
+
+Plusieurs bonnes pratiques ont été appliquées :
+
+- **Sécurité**
+  - Aucune clé d’API n’est exposée dans le code
+  - Les clés sont chargées via des variables d’environnement (`.env`)
+
+- **Performance**
+  - Les composants lourds (vectorstore, prompt, LLM) sont chargés une seule fois au démarrage
+  - Les requêtes `/ask` réutilisent la même instance
+  - Le cache est invalidé uniquement après un `/rebuild`
+
+- **Robustesse**
+  - Validation des entrées utilisateur
+  - Gestion des erreurs (requêtes invalides, question vide, etc.)
+
+### Tests fonctionnels de l’API
+
+Un script de test fonctionnel est fourni pour valider le bon fonctionnement de l’API :
+```text
+api_test.py
+```
+Ce script :
+- teste le endpoint `/ask` avec différents paramètres,
+- valide les réponses retournées,
+- permet de vérifier rapidement le comportement de l’API sans passer par Swagger.
+
+### Évaluation automatique du système RAG
+
+Une évaluation automatique est implémentée à l’aide d’un jeu de questions « gold » et de métriques objectives :
+
+- précision,
+- rappel,
+- score F1,
+
+basées sur les sources attendues pour chaque question.
+
+Cette évaluation est reproductible, indépendante de services externes payants, et adaptée à une intégration future en CI.
+
+### Résultat
+À l’issue de cette étape, le projet dispose :
+- d’une API REST locale exposant le système RAG,
+- d’un endpoint `/ask` fonctionnel,
+- d’un endpoint `/rebuild` pour la maintenance de l’index,
+- d’une documentation Swagger automatique,
+- d’un test fonctionnel de l’API,
+- d’une évaluation automatique du système.
+
+Cette API constitue une base solide pour une intégration future en environnement métier ou en production.

@@ -12,6 +12,8 @@ from src.rag.llm import get_llm
 from src.rag.prompt import SYSTEM_PROMPT, HUMAN_PROMPT
 from src.rag.retrieval_scored import ScoredFilteredRetriever
 
+_COMPONENTS_CACHE = None
+_SHARED_CACHE = None  # (vs, prompt, llm)
 
 DEFAULT_ALLOWED_CITIES = {
     "Gif-sur-Yvette",
@@ -39,13 +41,31 @@ def docs_to_sources(docs: List[Document], max_excerpt_chars: int = 220) -> List[
     return out
 
 
+def get_shared_components():
+    global _SHARED_CACHE
+    if _SHARED_CACHE is None:
+        vs = load_vectorstore()
+
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", SYSTEM_PROMPT.strip()),
+                ("human", HUMAN_PROMPT.strip()),
+            ]
+        )
+
+        llm = get_llm()
+        _SHARED_CACHE = (vs, prompt, llm)
+    return _SHARED_CACHE
+
+
 def build_components(
     allowed_cities: Optional[Set[str]] = None,
     k_fetch: int = 30,
     k_final: int = 5,
-    max_distance: float = 1.0,
+    max_distance: float = 1.3,
+    future_only: bool = True,
 ):
-    vs = load_vectorstore()
+    vs, prompt, llm = get_shared_components()
 
     retriever = ScoredFilteredRetriever(
         vectorstore=vs,
@@ -53,17 +73,10 @@ def build_components(
         k_fetch=k_fetch,
         k_final=k_final,
         max_distance=max_distance,
+        future_only=future_only,
     )
-
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", SYSTEM_PROMPT.strip()),
-            ("human", HUMAN_PROMPT.strip()),
-        ]
-    )
-
-    llm = get_llm()
     return retriever, prompt, llm
+
 
 
 def format_sources_block(sources: List[Dict[str, Any]]) -> str:
@@ -78,8 +91,8 @@ def format_sources_block(sources: List[Dict[str, Any]]) -> str:
     return "\n\nSources :\n- " + "\n- ".join(uids) if uids else "\n\nSources :\n- Aucune source pertinente."
 
 
-def answer_question(question: str, allowed_cities: Optional[Set[str]] = None, llm_override = None) -> RAGResult:
-    retriever, prompt, llm = build_components(allowed_cities=allowed_cities)
+def answer_question(question: str, allowed_cities: Optional[Set[str]] = None, llm_override=None, future_only: bool = True) -> RAGResult:
+    retriever, prompt, llm = build_components(allowed_cities=allowed_cities, future_only=future_only)
 
     if llm_override is not None:
         llm = llm_override
@@ -97,9 +110,9 @@ def answer_question(question: str, allowed_cities: Optional[Set[str]] = None, ll
 
     # Heuristique de confiance : si même le meilleur résultat est “limite”, on ne montre pas de sources
     best = min(dists) if dists else 999.0
-    if best > 0.95:
+    if best > 1.3: # au lieu de 0.95
         return RAGResult(
-            answer="Je n'ai pas trouvé d'événement suffisamment pertinent pour cette demande dans les données. Essaie un thème plus large (ex: “conférence”, “exposition”, “atelier”) ou une autre ville.",
+            answer="Je n'ai pas trouvé d'événement suffisamment pertinent...",
             sources=[],
         )
 

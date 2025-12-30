@@ -25,6 +25,7 @@ class ScoredFilteredRetriever:
     k_fetch: int = 20
     k_final: int = 5
     max_distance: float = 1.0
+    future_only: bool = True
 
     def retrieve(self, question: str) -> List[Tuple[Document, float]]:
         now = datetime.now(timezone.utc)
@@ -44,20 +45,17 @@ class ScoredFilteredRetriever:
                         continue
 
                 dt = parse_dt_utc(md.get("first_begin_dt"))
-                if dt is None or dt < now:
-                    continue
+                if self.future_only:
+                    if dt is None or dt < now:
+                        continue
 
                 kept.append((doc, dist))
                 if len(kept) >= self.k_final:
                     break
             return kept
 
-        # Pass 1: strict
         kept = run(self.max_distance)
-
-        # Pass 2: relax if not enough
         if len(kept) < min(3, self.k_final):
             kept = run(self.max_distance + 0.2)
 
         return kept
-

@@ -13,7 +13,7 @@ INDEX_DIR = Path("data/index/faiss_events")
 INDEX_DIR.parent.mkdir(parents=True, exist_ok=True)
 
 
-def main():
+def main() -> dict:
     # 1) Load + chunk -> Documents
     df = load_index_ready()
     docs = build_documents(df, chunk_size=800, chunk_overlap=120)
@@ -36,6 +36,7 @@ def main():
     vectorstore.save_local(str(INDEX_DIR))
     print(f"FAISS index saved to: {INDEX_DIR.resolve()}")
 
+    return {"rows": len(df), "chunks": len(docs), "index_dir": str(INDEX_DIR)}
 
 if __name__ == "__main__":
     main()
