@@ -400,3 +400,88 @@ Cette évaluation est reproductible, indépendante de services externes payants,
 - d’une évaluation automatique du système.
 
 Cette API constitue une base solide pour une intégration future en environnement métier ou en production.
+
+## Conteneurisation, déploiement local et démonstration
+
+### Objectif
+Cette étape vise à rendre le système RAG entièrement **exécutable localement**, **conteneurisé avec Docker**, et **présentable lors de la soutenance**.
+
+Le système final permet :
+- de lancer l’API RAG via un conteneur Docker,
+- d’interroger le système via une API REST documentée,
+- de démontrer le fonctionnement de bout en bout lors d’une démo live.
+
+## Prérequis
+- Docker Desktop installé et fonctionnel
+- Python 3.11 (pour les scripts locaux)
+- Index FAISS déjà généré (ou générable via script)
+
+## Reconstruction de l’index vectoriel
+
+Un script dédié permet de reconstruire la base vectorielle FAISS à partir des données sources.
+
+Commande à exécuter à la racine du projet :
+```text
+python scripts/build_index.py
+```
+Ce script :
+- recharge les données préparées,
+- génère les embeddings,
+- reconstruit l’index FAISS dans `data/index/faiss_events`.
+
+## Lancement de l’API avec Docker
+
+Le projet est entièrement conteneurisé et peut être lancé avec une seule commande grâce à Docker Compose.
+
+### Lancement du conteneur
+Depuis la racine du projet :
+
+```text
+docker compose up --build
+```
+Cette commande :
+- build l’image Docker,
+- lance l’API FastAPI,
+- monte le dossier `data/` en volume pour accéder à l’index FAISS.
+
+## Accès à la documentation Swagger
+
+Une documentation interactive est automatiquement générée par FastAPI et accessible à l’adresse :
+
+```text
+http://127.0.0.1:8000/docs
+```
+Elle permet de tester les endpoints directement depuis le navigateur.
+
+## Endpoints principaux
+
+### `/ask` — Poser une question
+- Méthode : POST
+- Permet de poser une question au système RAG et d’obtenir une réponse enrichie par les documents pertinents.
+- La réponse inclut les sources utilisées.
+
+### `/rebuild` — Reconstruire l’index
+- Méthode : POST
+- Permet de relancer la reconstruction complète de la base vectorielle si les données ont été mises à jour.
+
+## Démonstration (soutenance)
+
+La démonstration repose sur :
+- une API locale (Docker),
+- un index vectoriel local (FAISS),
+- des scénarios métiers réalistes (événements à venir, filtrage géographique).
+
+## Choix techniques clés
+- **FAISS** pour la recherche vectorielle locale
+- **LangChain** pour l’orchestration RAG
+- **FastAPI** pour l’exposition API et Swagger
+- **Docker / Docker Compose** pour la portabilité et la reproductibilité
+
+## Conclusion
+Le système RAG est :
+- fonctionnel de bout en bout,
+- testable via API,
+- déployable localement en une commande,
+- prêt à être démontré en conditions réelles.
+
+Cette approche garantit une solution robuste, maintenable et compréhensible pour des profils techniques comme métier.

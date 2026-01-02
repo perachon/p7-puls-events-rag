@@ -1,0 +1,11 @@
+services:
+  api:
+    build: .
+    image: puls-events-rag:latest
+    container_name: puls-events-rag-api
+    ports:
+      - "8000:8000"
+    environment:
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+    volumes:
+      - ./data:/app/data
